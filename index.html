@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이지성 | SK하이닉스 포트폴리오 웹사이트</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+    <!-- Welcome Modal -->
+    <div id="welcome-modal" class="modal-overlay">
+        <div class="modal-card">
+            <h2>Welcome!</h2>
+            <p>저의 웹사이트에 오신 것을 환영합니다!<br>궁금하신게 있다면 언제든 자유게시판과 문의하기로 연락해 주세요.</p>
+            <div class="modal-footer">
+                <button class="modal-btn" onclick="closeModal()">시작하기</button>
+                <label class="dont-show-container">
+                    <input type="checkbox" id="dont-show-again">
+                    다시 보지 않기
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-backdrop">
+        <video autoplay muted playsinline class="bg-video" id="bg-video">
+            <source src="https://cdn.pixabay.com/video/2021/09/11/88223-606079076_large.mp4" type="video/mp4"
+                id="video-source">
+        </video>
+        <div class="bg-overlay"></div>
+    </div>
+    <canvas id="bg-canvas"></canvas>
+    <div class="mesh-gradient"></div>
+
+    <nav>
+        <div class="logo">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" style="margin-right: 12px;">
+                <rect x="2" y="2" width="20" height="20" rx="4" stroke="var(--orange)" stroke-width="2.5" />
+                <path d="M7 12L12 7L17 12" stroke="white" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round" />
+            </svg>
+            <span style="color: var(--orange); font-weight: 800; margin-right: 15px;">SK HYNIX</span> <span
+                style="font-weight: 500; opacity: 0.8; letter-spacing: 1px;">LEE JISUNG</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#hero" class="active" onclick="navigateTo('hero')">소개</a></li>
+            <li><a href="#curriculum" onclick="navigateTo('curriculum')">교육과정</a></li>
+            <li><a href="#roadmap" onclick="navigateTo('roadmap')">미래 로드맵</a></li>
+            <li><a href="#link" onclick="navigateTo('link')">나의 강점</a></li>
+            <li><a href="#records" onclick="navigateTo('records')">나의 이력</a></li>
+            <li><a href="#board" onclick="navigateTo('board')">자유게시판</a></li>
+            <li><a href="#contact" class="nav-btn" onclick="navigateTo('contact')">문의하기</a></li>
+        </ul>
+        <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" aria-label="테마 변경">
+            <svg id="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+        </button>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero active">
+        <div class="scroll-reveal">
+            <h1 style="margin-bottom: 10px;">Scaling<br><span class="serif">Intelligence</span></h1>
+            <h1 style="color: var(--orange);">for SK hynix.</h1>
+            <p style="margin-top: 50px; margin-bottom: 60px; font-weight: 500;">
+                "반도체 핵심 공정을 책임지는 미래 전문가"<br>
+                동양미래대학교 로봇소프트웨어과에서 배운 지식과<br>
+                경험 및 데이터로 <span style="color: var(--orange); font-weight: 800;">SK hynix</span>에 필요한 인재가 되기 위해 노력하는
+                <strong>이지성</strong>입니다.
+            </p>
+            <!-- Intro Buttons Removed -->
+        </div>
+        <div class="hero-visual scroll-reveal">
+            <img src="assets/scaling_master_key.png" alt="Scaling Master Key">
+        </div>
+    </section>
+
+    <!-- Updated Section: Academic Blueprint (Year-by-Year Curriculum) -->
+    <section id="curriculum" style="background: rgba(0,0,0,0.2);">
+        <div class="scroll-reveal">
+            <h2
+                style="margin-bottom: 20px; font-size: 0.8rem; letter-spacing: 12px; color: var(--orange); font-weight: 800; text-transform: uppercase;">
+                Academic Blueprint</h2>
+            <h1 class="section-title">동양미래대학교 <span class="serif">로봇소프트웨어과 교육과정</span></h1>
+
+            <div class="curriculum-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start;">
+                <!-- 1학년 교육과정 -->
+                <div
+                    style="background: var(--glass); padding: 45px; border-radius: 40px; border: 1px solid var(--orange);">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 35px;">
+                        <span
+                            style="background: var(--orange); color: white; padding: 5px 15px; border-radius: 10px; font-weight: 800; font-size: 0.9rem;">1학년</span>
+                        <h3 style="font-size: 1.8rem;">기초 기술 및 공학 소양</h3>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 25px;">
+                        <div>
+                            <h4 style="color: var(--white); font-size: 1.1rem; margin-bottom: 8px;">CAD 및 3D 모델링</h4>
+                            <p
+                                style="color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; margin-bottom: 12px;">
+                                [3차원CAD, CAD기초] 로봇 및 기계 부품의 정밀 도면 설계와 3D 모델링 기초를 습득했습니다.</p>
+                            <div
+                                style="padding: 15px; background: rgba(255,255,255,0.03); border-radius: 15px; border-left: 3px solid var(--orange);">
+                                <strong
+                                    style="font-size: 0.85rem; color: var(--orange); display: block; margin-bottom: 5px;">→
+                                    현장 응용: 설비 도면 해석 및 결함 예방</strong>
+                                <span style="font-size: 0.85rem; color: var(--text-dim);">반도체 설비 도면을 해석하여 부품 교체 시 정밀 치수를
+                                    확인하고, 물리적 결함을 사전에 방지합니다.</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 style="color: var(--white); font-size: 1.1rem; margin-bottom: 8px;">전기·전자 회로 기초</h4>
+                            <p
+                                style="color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; margin-bottom: 12px;">
+                                [전기회로, 디지털논리회로] 전기 법칙과 논리 회로 구성을 통해 시스템의 하드웨어 원리를 이해했습니다.</p>
+                            <div
+                                style="padding: 15px; background: rgba(255,255,255,0.03); border-radius: 15px; border-left: 3px solid var(--orange);">
+                                <strong
+                                    style="font-size: 0.85rem; color: var(--orange); display: block; margin-bottom: 5px;">→
+                                    현장 응용: 하드웨어 장애 진단 및 복구</strong>
+                                <span style="font-size: 0.85rem; color: var(--text-dim);">설비 제어반의 회로 구조를 바탕으로 전기적 신호 흐름을
+                                    추적하여 하드웨어 장애를 신속하게 해결합니다.</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 style="color: var(--white); font-size: 1.1rem; margin-bottom: 8px;">프로그래밍 기초 (파이썬/아두이노)
+                            </h4>
+                            <p
+                                style="color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; margin-bottom: 12px;">
+                                [파이썬, 아두이노프로그래밍] 데이터 처리 소프트웨어와 마이크로컨트롤러 제어 기초를 익혔습니다.</p>
+                            <div
+                                style="padding: 15px; background: rgba(255,255,255,0.03); border-radius: 15px; border-left: 3px solid var(--orange);">
+                                <strong
+                                    style="font-size: 0.85rem; color: var(--orange); display: block; margin-bottom: 5px;">→
+                                    현장 응용: 예방 보전 데이터 분석</strong>
+                                <span style="font-size: 0.85rem; color: var(--text-dim);">센서 데이터를 수집하는 툴을 제작하여 설비의 이상
+                                    징후를 조기에 발견하는 시스템의 기초를 마련합니다.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2학년 교육과정 -->
+                <div
+                    style="background: var(--glass); padding: 45px; border-radius: 40px; border: 1px solid var(--orange);">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 35px;">
+                        <span
+                            style="background: var(--orange); color: white; padding: 5px 15px; border-radius: 10px; font-weight: 800; font-size: 0.9rem;">2학년</span>
+                        <h3 style="font-size: 1.8rem;">심화 제어 및 실무 응용</h3>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 25px;">
+                        <div>
+                            <h4 style="color: var(--white); font-size: 1.1rem; margin-bottom: 8px;">산업용 PLC 및 제어 시스템
+                            </h4>
+                            <p
+                                style="color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; margin-bottom: 12px;">
+                                [PLC프로그래밍, PC기반제어] 산업용 자동화 기기의 동작 원리와 프로그래밍 기술을 심화 학습했습니다.</p>
+                            <div
+                                style="padding: 15px; background: rgba(255,255,255,0.03); border-radius: 15px; border-left: 3px solid var(--orange);">
+                                <strong
+                                    style="font-size: 0.85rem; color: var(--orange); display: block; margin-bottom: 5px;">→
+                                    현장 응용: 자동화 라인 최적화</strong>
+                                <span style="font-size: 0.85rem; color: var(--text-dim);">SK하이닉스 공정 라인의 PLC 로직을 분석하고 제어
+                                    시퀀스를 개선하여 라인 가동률을 극대화합니다.</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 style="color: var(--white); font-size: 1.1rem; margin-bottom: 8px;">정밀 구동 및 센서 통합</h4>
+                            <p
+                                style="color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; margin-bottom: 12px;">
+                                [모터제어, 로봇센서] 서보 모터 정밀 제어와 다양한 센서 데이터 통합 처리 기법을 익혔습니다.</p>
+                            <div
+                                style="padding: 15px; background: rgba(255,255,255,0.03); border-radius: 15px; border-left: 3px solid var(--orange);">
+                                <strong
+                                    style="font-size: 0.85rem; color: var(--orange); display: block; margin-bottom: 5px;">→
+                                    현장 응용: 웨이퍼 손상 방지 및 정밀 제어</strong>
+                                <span style="font-size: 0.85rem; color: var(--text-dim);">이송 로봇 모터의 가속/감속 프로파일을 정밀 제어하여
+                                    웨이퍼 손상을 막고 수율을 보호합니다.</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 style="color: var(--white); font-size: 1.1rem; margin-bottom: 8px;">임베디드 및 AI 융합</h4>
+                            <p
+                                style="color: var(--text-dim); font-size: 0.9rem; line-height: 1.6; margin-bottom: 12px;">
+                                [마이크로컨트롤러, 펌웨어, 인공지능] 로우 레벨 하드웨어 제어와 AI 기반 판단 로직을 학습했습니다.</p>
+                            <div
+                                style="padding: 15px; background: rgba(255,255,255,0.03); border-radius: 15px; border-left: 3px solid var(--orange);">
+                                <strong
+                                    style="font-size: 0.85rem; color: var(--orange); display: block; margin-bottom: 5px;">→
+                                    현장 응용: 지능형 설비 유지보수</strong>
+                                <span style="font-size: 0.85rem; color: var(--text-dim);">AI 알고리즘으로 부품 수명을 예측하고, 제어기 펌웨어
+                                    수준에서 문제를 진단하여 정지 시간을 최소화합니다.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Future Roadmap Section -->
+    <section id="roadmap" style="background: rgba(255, 92, 0, 0.02);">
+        <div class="scroll-reveal">
+            <h2
+                style="margin-bottom: 20px; font-size: 0.8rem; letter-spacing: 12px; color: var(--orange); font-weight: 800; text-transform: uppercase;">
+                Future Roadmap</h2>
+            <h1 class="section-title">동양미래대학교 <span class="serif">전공 심화 및 마이크로디그리</span></h1>
+
+            <div class="grid-3-col roadmap-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px;">
+                <!-- 01. 3rd Year Curriculum -->
+                <div
+                    style="background: var(--glass); padding: 45px; border-radius: 40px; border: 1px solid var(--orange); position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top: -10px; right: 20px; font-size: 5rem; font-weight: 900; opacity: 0.05; color: var(--orange);">
+                        01</div>
+                    <h4
+                        style="color: var(--orange); font-size: 0.8rem; font-weight: 800; margin-bottom: 15px; letter-spacing: 2px;">
+                        3RD YEAR CURRICULUM</h4>
+                    <h3 style="font-size: 1.6rem; margin-bottom: 25px;">전공 심화 및 지능형 제어</h3>
+                    <p style="color: var(--text-dim); font-size: 1rem; line-height: 1.7; margin-bottom: 20px;">
+                        3학년 과정에서는 로봇 제어를 넘어 <strong>반도체 설비 제어</strong>에 필요한 최상위 기술을 학습합니다.
+                    </p>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 15px;">
+                        <li style="color: var(--white); font-size: 0.95rem;">
+                            <strong style="color: var(--orange); display: block;">● 인공지능(AI) 머신비전</strong>
+                            Vision AI를 활용한 웨이퍼 및 회로 기판 미세 결함 판독 알고리즘 구현
+                        </li>
+                        <li style="color: var(--white); font-size: 0.95rem;">
+                            <strong style="color: var(--orange); display: block;">● 스마트팩토리 센서 및 네트워크</strong>
+                            실시간 통신(EtherCAT)을 활용한 다축 로봇 및 장비 동기화 제어
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 02. Micro Degree -->
+                <div
+                    style="background: var(--glass); padding: 45px; border-radius: 40px; border: 1px solid var(--orange); position: relative; overflow: hidden; transform: translateY(-15px); box-shadow: 0 20px 40px rgba(255, 92, 0, 0.1);">
+                    <div
+                        style="position: absolute; top: -10px; right: 20px; font-size: 5rem; font-weight: 900; opacity: 0.05; color: var(--orange);">
+                        02</div>
+                    <h4
+                        style="color: var(--orange); font-size: 0.8rem; font-weight: 800; margin-bottom: 15px; letter-spacing: 2px;">
+                        MICRO DEGREE</h4>
+                    <h3 style="font-size: 1.6rem; margin-bottom: 25px;">반도체 특화 마이크로디그리</h3>
+                    <p style="color: var(--text-dim); font-size: 1rem; line-height: 1.7; margin-bottom: 20px;">
+                        대학 내 반도체 전문 트랙을 이수하여 <strong>핵심 공정 장비의 소프트웨어 아키텍처와 메커니즘</strong>을 완벽히 습득합니다.
+                    </p>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 15px;">
+                        <li style="color: var(--white); font-size: 0.95rem;">
+                            <strong style="color: var(--orange); display: block;">● 8대 공정 및 장비 이해</strong>
+                            반도체 제조 공정별 핵심 설비의 작동 원리와 제어 시스템 분석
+                        </li>
+                        <li style="color: var(--white); font-size: 0.95rem;">
+                            <strong style="color: var(--orange); display: block;">● SECS/GEM 통신 및 예지보전</strong>
+                            현업에서 쓰이는 표준 프로토콜 학습 및 데이터를 활용한 설비 고장 예측 프로젝트
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 03. Target SK Hynix -->
+                <div
+                    style="background: var(--glass); padding: 45px; border-radius: 40px; border: 1px solid var(--orange); position: relative; overflow: hidden;">
+                    <div
+                        style="position: absolute; top: -10px; right: 20px; font-size: 5rem; font-weight: 900; opacity: 0.05; color: var(--orange);">
+                        03</div>
+                    <h4
+                        style="color: var(--orange); font-size: 0.8rem; font-weight: 800; margin-bottom: 15px; letter-spacing: 2px;">
+                        FOR SK HYNIX</h4>
+                    <h3 style="font-size: 1.6rem; margin-bottom: 25px;">반도체 공정 자동화 전문가</h3>
+                    <p style="color: var(--text-dim); font-size: 1rem; line-height: 1.7; margin-bottom: 20px;">
+                        3년간 쌓아온 로봇 제어 기술과 반도체 장비 지식을 융합하여 <strong>SK hynix의 최전선</strong>을 책임지는 엔지니어가 됩니다.
+                    </p>
+                    <ul style="list-style: none; display: flex; flex-direction: column; gap: 15px;">
+                        <li style="color: var(--white); font-size: 0.95rem;">
+                            <strong style="color: var(--orange); display: block;">● 실전 트러블슈팅 역량</strong>
+                            캡스톤 디자인을 통한 실제 장비 결함 해결 능력 및 센서 캘리브레이션 기술 배양
+                        </li>
+                        <li style="color: var(--white); font-size: 0.95rem;">
+                            <strong style="color: var(--orange); display: block;">● 수율 혁신의 핵심 인재</strong>
+                            장비 하드웨어 지식과 시스템 소프트웨어 분석력을 모두 갖춘 융합형 엔지니어로 활약
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Future Vision Quote -->
+            <div
+                style="margin-top: 60px; padding: 40px; background: rgba(255, 255, 255, 0.03); border-radius: 30px; border-left: 5px solid var(--orange); text-align: left;">
+                <h4
+                    style="color: var(--orange); font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.2rem; margin-bottom: 10px;">
+                    [Final Step: Shaping the Future of Semiconductors]</h4>
+                <p style="color: var(--text-dim); font-size: 1.1rem; line-height: 1.8;">
+                    "동양미래대학교의 <strong>전공 심화 과정과 반도체 마이크로디그리 트랙</strong>을 통해 제어 기술의 기초부터 실무형 공정 데이터 분석까지 모든 준비를 마쳤습니다.
+                    단순히 장비를 다루는 것을 넘어, 융합 지식으로 <strong>SK hynix의 자동화 설비 유지보수와 수율 극대화</strong>를 이끄는 핵심 전문가가 되겠습니다."
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- The Strategic Link Section -->
+    <section id="link" style="background: rgba(255,255,255,0.02); padding-top: 150px; padding-bottom: 150px;">
+        <div class="content-wrapper">
+            <h2
+                style="margin-bottom: 20px; font-size: 0.8rem; letter-spacing: 12px; color: var(--orange); font-weight: 800; text-transform: uppercase;">
+                The Strategic Link</h2>
+            <h1 class="section-title">나의 강점과 <span class="serif">반도체 현장의 연결고리</span></h1>
+
+            <div style="display: flex; flex-direction: column; gap: 40px;">
+                <!-- Step 01 -->
+                <div class="link-card"
+                    style="display: grid; grid-template-columns: 100px 1fr 1.8fr; gap: 40px; align-items: start; background: var(--glass); padding: 50px; border-radius: 40px; border: 1px solid var(--orange);">
+                    <div style="font-size: 3rem; font-weight: 800; color: var(--orange); opacity: 0.5;">01.</div>
+                    <div>
+                        <h4 style="font-size: 0.8rem; color: var(--orange); font-weight: 800; margin-bottom: 10px;">MY
+                            STRENGTH: 꼼꼼함</h4>
+                        <h3 style="font-size: 2rem; margin-bottom: 20px;">[결함 제로를 향한 집념]</h3>
+                    </div>
+                    <div style="padding-left: 40px; border-left: 1px solid var(--glass-border);">
+                        <p
+                            style="color: var(--white); font-size: 1.15rem; font-weight: 600; line-height: 1.7; margin-bottom: 15px;">
+                            어떤 상황에서도 문제의 원인을 끝까지 찾아내 해결합니다. 아주 미세한 오류조차 그냥 지나치지 않는 꼼꼼함이 저의 무기입니다.
+                        </p>
+                        <p style="color: var(--text-dim); line-height: 1.8;">
+                            SK하이닉스의 반도체 공정 장비들이 <strong>최적의 상태로 가동하도록</strong> 관리하여 생산 효율을 높이겠습니다.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Step 02 -->
+                <div class="link-card"
+                    style="display: grid; grid-template-columns: 100px 1fr 1.8fr; gap: 40px; align-items: start; background: var(--glass); padding: 50px; border-radius: 40px; border: 1px solid var(--orange);">
+                    <div style="font-size: 3rem; font-weight: 800; color: var(--orange); opacity: 0.5;">02.</div>
+                    <div>
+                        <h4 style="font-size: 0.8rem; color: var(--orange); font-weight: 800; margin-bottom: 10px;">MY
+                            STRENGTH: 도전 정신</h4>
+                        <h3 style="font-size: 2rem; margin-bottom: 20px;">[끊이지 않는 도전 정신]</h3>
+                    </div>
+                    <div style="padding-left: 40px; border-left: 1px solid var(--glass-border);">
+                        <p
+                            style="color: var(--white); font-size: 1.15rem; font-weight: 600; line-height: 1.7; margin-bottom: 15px;">
+                            문제 발견 시 문제의 원인과 결과에 끊임없이 질문을 던지는 도전 정신으로 반도체 공정을 더 효율적으로 바꾸기 위해 노력하겠습니다.
+                        </p>
+                        <p style="color: var(--text-dim); line-height: 1.8;">
+                            <strong>불량품이 나올 원인을 분석 및 사전 차단</strong>하여 반도체의 품질과 효율을 한 단계 더 높이겠습니다.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Step 03 -->
+                <div class="link-card"
+                    style="display: grid; grid-template-columns: 100px 1fr 1.8fr; gap: 40px; align-items: start; background: var(--glass); padding: 50px; border-radius: 40px; border: 1px solid var(--orange);">
+                    <div style="font-size: 3rem; font-weight: 800; color: var(--orange); opacity: 0.5;">03.</div>
+                    <div>
+                        <h4 style="font-size: 0.8rem; color: var(--orange); font-weight: 800; margin-bottom: 10px;">MY
+                            STRENGTH: 엔지니어적 사고</h4>
+                        <h3 style="font-size: 2rem; margin-bottom: 20px;">[자동화 시스템 설계 및 유지보수]</h3>
+                    </div>
+                    <div style="padding-left: 40px; border-left: 1px solid var(--glass-border);">
+                        <p
+                            style="color: var(--white); font-size: 1.15rem; font-weight: 600; line-height: 1.7; margin-bottom: 15px;">
+                            반도체 장비의 메커니즘과 소프트웨어의 데이터 흐름을 유기적으로 연결하여 자동화 시스템을 설계하고 관리하겠습니다.
+                        </p>
+                        <p style="color: var(--text-dim); line-height: 1.8;">
+                            장비 스스로 결함을 찾아내고 관리하는 <strong>지능형 스마트 공장 시스템</strong>을 연구 및 설계하겠습니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- History Section (Renamed from Records) -->
+    <section id="records">
+        <div class="content-wrapper">
+            <h2
+                style="margin-bottom: 20px; font-size: 0.8rem; letter-spacing: 12px; color: var(--orange); font-weight: 800; text-transform: uppercase;">
+                My History</h2>
+            <h1 class="section-title">창의적 공학설계 캡스톤 디자인 <span class="serif">보행로봇 경진대회</span></h1>
+
+            <div id="history-container"
+                style="background: var(--glass); border-radius: 40px; border: 1px solid var(--orange); padding: 50px;">
+                <p
+                    style="color: var(--text-dim); font-size: 1.1rem; line-height: 1.8; margin-bottom: 60px; text-align: center;">
+                    6족 보행로봇 설계 프로젝트
+                </p>
+
+                <div class="records-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start;">
+                    <!-- LEFT COLUMN (Steps 1-4) -->
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <!-- Step 1: 설계 -->
+                        <div
+                            style="display: flex; gap: 25px; align-items: center; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 20px; border: 1px solid var(--orange);">
+                            <img src="assets/설계.png" alt="로봇 설계 (3D CAD)"
+                                style="width: 140px; height: 140px; border-radius: 12px; object-fit: cover; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
+                            <div style="flex: 1;">
+                                <span
+                                    style="color: var(--orange); font-weight: 800; font-size: 0.8rem; letter-spacing: 2px;">STEP
+                                    01</span>
+                                <h4 style="color: var(--white); font-size: 1.3rem; margin: 8px 0;">3D 기구 설계</h4>
+                                <p style="color: var(--text-dim); font-size: 0.95rem; line-height: 1.5; margin: 0;">
+                                    SolidWorks를 활용해 6족 보행 메커니즘과 기구부를 정밀 설계했습니다.</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: 레이저커팅 -->
+                        <div
+                            style="display: flex; gap: 25px; align-items: center; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 20px; border: 1px solid var(--orange);">
+                            <img src="assets/레이저커팅.png" alt="레이저 커팅"
+                                style="width: 140px; height: 140px; border-radius: 12px; object-fit: contain; background: #fff; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
+                            <div style="flex: 1;">
+                                <span
+                                    style="color: var(--orange); font-weight: 800; font-size: 0.8rem; letter-spacing: 2px;">STEP
+                                    02</span>
+                                <h4 style="color: var(--white); font-size: 1.3rem; margin: 8px 0;">레이저 커팅 가공</h4>
+                                <p style="color: var(--text-dim); font-size: 0.95rem; line-height: 1.5; margin: 0;">설계를
+                                    바탕으로 CAD 프로그램을 사용해 도면을 작성하고 레이저 가공으로 실제 부품을 만들어냈습니다.</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: 로봇 조립 -->
+                        <div
+                            style="display: flex; gap: 25px; align-items: center; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 20px; border: 1px solid var(--orange);">
+                            <img src="assets/로봇조립.png" alt="로봇 조립 과정"
+                                style="width: 140px; height: 140px; border-radius: 12px; object-fit: cover; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
+                            <div style="flex: 1;">
+                                <span
+                                    style="color: var(--orange); font-weight: 800; font-size: 0.8rem; letter-spacing: 2px;">STEP
+                                    03</span>
+                                <h4 style="color: var(--white); font-size: 1.3rem; margin: 8px 0;">프레임 및 링크 조립</h4>
+                                <p style="color: var(--text-dim); font-size: 0.95rem; line-height: 1.5; margin: 0;">가공한
+                                    링크들과 모터, 기어박스 등을 체결하여 실제 로봇을 조립했습니다.</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: 최종 완성 -->
+                        <div
+                            style="display: flex; gap: 25px; align-items: center; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 20px; border: 1px solid var(--orange);">
+                            <img src="assets/최종완성.png" alt="최종 완성 로봇"
+                                style="width: 140px; height: 140px; border-radius: 12px; object-fit: cover; box-shadow: 0 10px 20px rgba(0,0,0,0.2);">
+                            <div style="flex: 1;">
+                                <span
+                                    style="color: var(--orange); font-weight: 800; font-size: 0.8rem; letter-spacing: 2px;">STEP
+                                    04</span>
+                                <h4 style="color: var(--white); font-size: 1.3rem; margin: 8px 0;">최종 완성 및 테스트</h4>
+                                <p style="color: var(--text-dim); font-size: 0.95rem; line-height: 1.5; margin: 0;">전원
+                                    연결 및 반복적인 보행 작동 테스트를 거쳐 빠르고 안정적인 6족 보행로봇을 완성했습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN (Step 5 & Final Achievement) -->
+                    <div style="display: flex; flex-direction: column; gap: 20px;">
+                        <!-- Step 5: 대회 본선 진행 -->
+                        <div
+                            style="background: rgba(255,255,255,0.02); padding: 30px; border-radius: 20px; border: 1px solid var(--orange);">
+                            <div style="margin-bottom: 20px;">
+                                <span
+                                    style="color: var(--orange); font-weight: 800; font-size: 0.8rem; letter-spacing: 2px;">STEP
+                                    05</span>
+                                <h4 style="color: var(--white); font-size: 1.6rem; margin: 10px 0;">대회 본선</h4>
+                                <p style="color: var(--text-dim); font-size: 1rem; line-height: 1.5; margin: 0;">경진대회
+                                    현장에서 최종 점검을 마치고, 실전 대회에서 완성된 보행 로봇을 성공적으로 시연했습니다.</p>
+                            </div>
+                            <div class="capstone-img-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                                <img src="assets/캡스톤 1.png" alt="대회 진행 1"
+                                    style="width: 100%; height: 120px; object-fit: cover; border-radius: 10px; border: 1px solid var(--glass-border);">
+                                <img src="assets/캡스톤 2.png" alt="대회 진행 2"
+                                    style="width: 100%; height: 120px; object-fit: cover; border-radius: 10px; border: 1px solid var(--glass-border);">
+                                <img src="assets/캡스톤 4.png" alt="대회 진행 3"
+                                    style="width: 100%; height: 120px; object-fit: cover; border-radius: 10px; border: 1px solid var(--glass-border);">
+                            </div>
+                        </div>
+
+                        <!-- Final Achievement -->
+                        <div
+                            style="background: rgba(255, 92, 0, 0.05); padding: 40px; border-radius: 20px; border: 2px solid var(--orange); text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; box-shadow: 0 20px 40px rgba(255, 92, 0, 0.1);">
+                            <h3 style="font-size: 2.2rem; color: var(--orange); margin-bottom: 25px; font-weight: 800;">
+                                최종 순위 : 3위</h3>
+                            <img src="assets/단체사진.png" alt="대회 단체 사진"
+                                style="width: 100%; max-height: 280px; object-fit: cover; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.3);">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Board Section -->
+    <section id="board" style="background: rgba(0,0,0,0.3);">
+        <div class="content-wrapper">
+            <h2
+                style="margin-bottom: 20px; font-size: 0.8rem; letter-spacing: 12px; color: var(--orange); font-weight: 800; text-transform: uppercase;">
+                Community</h2>
+            <h1 class="section-title">자유게시판 & <span class="serif">문의사항</span></h1>
+
+            <!-- Board Controls -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <button onclick="toggleBoardForm()"
+                    style="background: var(--orange); color: white; border: none; padding: 15px 35px; border-radius: 100px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 20px rgba(255, 92, 0, 0.2);">새
+                    글 작성하기 ✍️</button>
+                <a href="#hero"
+                    style="color: var(--text-dim); text-decoration: none; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    홈으로 돌아가기
+                </a>
+            </div>
+
+            <div id="board-container">
+                <!-- Writing Form (Hidden by default) -->
+                <div id="board-form-container"
+                    style="display: none; background: var(--glass); padding: 50px; border-radius: 40px; border: 1px solid var(--orange); margin-bottom: 50px; animation: slideDown 0.4s ease-out;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                        <h3 id="form-title" style="font-size: 1.5rem;">소중한 의견을 남겨주세요</h3>
+                        <button onclick="toggleBoardForm()"
+                            style="background: transparent; border: none; color: var(--text-dim); font-size: 2rem; cursor: pointer;">&times;</button>
+                    </div>
+                    <form id="board-form" onsubmit="handleBoardSubmit(event)"
+                        style="display: flex; flex-direction: column; gap: 20px;">
+                        <input type="hidden" id="board-id">
+                        <div class="board-form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div>
+                                <label
+                                    style="display: block; font-size: 0.8rem; color: var(--orange); font-weight: 800; margin-bottom: 8px;">이름</label>
+                                <input type="text" id="board-name" required placeholder="성함을 입력하세요"
+                                    style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 15px 20px; border-radius: 15px; color: white; outline: none;">
+                            </div>
+                            <div>
+                                <label
+                                    style="display: block; font-size: 0.8rem; color: var(--orange); font-weight: 800; margin-bottom: 8px;">이메일</label>
+                                <input type="email" id="board-email" required placeholder="example@email.com"
+                                    style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 15px 20px; border-radius: 15px; color: white; outline: none;">
+                            </div>
+                        </div>
+                        <div>
+                            <label
+                                style="display: block; font-size: 0.8rem; color: var(--orange); font-weight: 800; margin-bottom: 8px;">제목</label>
+                            <input type="text" id="board-title" required placeholder="제목을 입력하세요"
+                                style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 15px 20px; border-radius: 15px; color: white; outline: none;">
+                        </div>
+                        <div>
+                            <label
+                                style="display: block; font-size: 0.8rem; color: var(--orange); font-weight: 800; margin-bottom: 8px;">내용</label>
+                            <textarea id="board-content" required placeholder="요청사항이나 문의 내용을 상세히 적어주세요"
+                                style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 15px 20px; border-radius: 15px; color: white; outline: none; min-height: 150px; resize: vertical;"></textarea>
+                        </div>
+                        <div style="display: flex; gap: 15px;">
+                            <button type="submit" id="submit-btn"
+                                style="flex: 2; background: var(--orange); color: white; border: none; padding: 20px; border-radius: 15px; font-weight: 800; cursor: pointer; transition: 0.3s;">게시글
+                                등록하기</button>
+                            <button type="button" onclick="toggleBoardForm()"
+                                style="flex: 1; background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--glass-border); padding: 20px; border-radius: 15px; font-weight: 800; cursor: pointer;">취소</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Post List -->
+                <div id="post-list"
+                    style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; min-height: 200px;">
+                    <!-- Posts will be injected here -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" style="background: rgba(255, 92, 0, 0.05);">
+        <div class="content-wrapper" style="text-align: center;">
+            <h2 style="margin-bottom: 20px;">Get in <span class="serif">Touch</span></h2>
+            <div
+                style="display: inline-flex; flex-direction: column; gap: 20px; text-align: left; background: var(--glass); padding: 50px 80px; border-radius: 40px; border: 1px solid var(--glass-border);">
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <span style="font-size: 1.5rem;">👤</span>
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--orange); font-weight: 800;">NAME / UNIV</div>
+                        <div style="font-size: 1.4rem; font-weight: 600;">이지성 (동양미래대학교 로봇소프트웨어과)</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <span style="font-size: 1.5rem;">📱</span>
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--orange); font-weight: 800;">PHONE</div>
+                        <div style="font-size: 1.4rem; font-weight: 600;">010-2162-6018</div>
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <span style="font-size: 1.5rem;">📧</span>
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--orange); font-weight: 800;">EMAIL</div>
+                        <div style="font-size: 1.4rem; font-weight: 600;">jisung6018@gmail.com</div>
+                    </div>
+                </div>
+                <!-- GitHub Link -->
+                <div
+                    style="display: flex; align-items: center; gap: 20px; padding-top: 10px; border-top: 1px solid var(--glass-border);">
+                    <span style="font-size: 1.5rem;">🔗</span>
+                    <a href="https://github.com/jisung6018-star" target="_blank"
+                        style="text-decoration: none; display: flex; align-items: center; gap: 10px; background: #24292e; color: white; padding: 10px 20px; border-radius: 12px; font-weight: 700; transition: 0.3s;">
+                        <svg height="20" width="20" viewBox="0 0 16 16" fill="white">
+                            <path
+                                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+                            </path>
+                        </svg>
+                        GitHub 바로가기
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p
+            style="text-align: center; padding: 40px 22px; color: var(--text-dim); border-top: 1px solid var(--glass-border); font-size: 0.8rem; letter-spacing: 3px; opacity: 0.6;">
+            © 2026 이지성: 동양미래대학교 로봇소프트웨어과
+        </p>
+    </footer>
+
+    <!-- Chat ORB Button -->
+    <div class="ai-orb" onclick="toggleChat()">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+            <path d="M12 1L12 23M1 12H23M12 1L21 12L12 23L3 12L12 1Z" />
+        </svg>
+    </div>
+
+    <!-- Chat Panel -->
+    <div class="chat-panel" id="chat-panel">
+        <div style="padding: 40px; background: linear-gradient(135deg, var(--orange), var(--red));">
+            <h4 style="font-weight: 800; font-size: 1.4rem; letter-spacing: -1px;">AI 도우미</h4>
+            <p style="font-size: 0.85rem; opacity: 0.9; margin-top: 5px;">궁금한 점을 질문해 보세요!</p>
+        </div>
+        <div id="chat-messages"
+            style="flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px;">
+            <div
+                style="background: rgba(255,255,255,0.08); padding: 25px; border-radius: 25px; align-self: flex-start; max-width: 90%; font-size: 1rem; border-left: 4px solid var(--orange); color: white;">
+                안녕하세요! 저는 AI 도우미입니다. 무엇이 궁금하신가요?
+            </div>
+            <div style="padding: 30px; border-top: 1px solid var(--glass-border); display: flex;">
+                <input type="text" id="chat-input" placeholder="학습한 전공 과목에 대해 질문하세요."
+                    style="flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 1rem;"
+                    onkeypress="handleChat(event)">
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+</body>
+
+</html>
