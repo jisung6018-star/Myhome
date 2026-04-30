@@ -349,12 +349,13 @@ onSnapshot(boardQuery, (snapshot) => {
         postCard.style.flexDirection = 'column';
         postCard.style.position = 'relative';
 
-        const dateStr = post.timestamp ? post.timestamp.toDate().toLocaleString('ko-KR') : "작성 중...";
+        // 1. 게시글 추천/수정/삭제 버튼
+        const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+        const isPostLiked = likedPosts.includes(docId);
         
-        // 게시글 추천/수정/삭제 버튼
         const postButtons = `
             <div style="display: flex; gap: 10px; align-items: center;">
-                <button onclick="likePost('${docId}')" style="background: rgba(255, 92, 0, 0.1); border: 1px solid var(--orange); color: var(--orange); padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; gap: 6px;">
+                <button onclick="likePost('${docId}')" style="background: ${isPostLiked ? 'var(--orange)' : 'rgba(255, 92, 0, 0.1)'}; border: 1px solid var(--orange); color: ${isPostLiked ? 'white' : 'var(--orange)'}; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; gap: 6px; transition: 0.3s;">
                     👍 ${post.likes || 0}
                 </button>
                 <button onclick="editPost('${docId}')" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--white); padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.8rem;">수정</button>
@@ -362,22 +363,26 @@ onSnapshot(boardQuery, (snapshot) => {
             </div>
         `;
 
-        // 댓글 목록 렌더링
-        let commentsHtml = (post.comments || []).map((comment, idx) => `
-            <div style="margin-top: 15px; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 18px; border: 1px solid var(--glass-border);">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
-                    <div>
-                        <span style="color: var(--orange); font-weight: 800; font-size: 0.85rem;">${comment.author}</span>
-                        <span style="color: var(--text-dim); font-size: 0.75rem; margin-left: 10px;">${comment.date}</span>
+        // 2. 댓글 목록 렌더링
+        const likedComments = JSON.parse(localStorage.getItem('liked_comments') || '[]');
+        let commentsHtml = (post.comments || []).map((comment, idx) => {
+            const isCommentLiked = likedComments.includes(`${docId}_${idx}`);
+            return `
+                <div style="margin-top: 15px; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 18px; border: 1px solid var(--glass-border);">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                        <div>
+                            <span style="color: var(--orange); font-weight: 800; font-size: 0.85rem;">${comment.author}</span>
+                            <span style="color: var(--text-dim); font-size: 0.75rem; margin-left: 10px;">${comment.date}</span>
+                        </div>
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                             <button onclick="likeComment('${docId}', ${idx})" style="background: none; border: none; color: ${isCommentLiked ? 'var(--orange)' : 'var(--text-dim)'}; cursor: pointer; font-size: 0.8rem; font-weight: ${isCommentLiked ? '800' : '400'};">👍 ${comment.likes || 0}</button>
+                             <button onclick="deleteComment('${docId}', ${idx})" style="background: none; border: none; color: var(--red); cursor: pointer; font-size: 0.75rem; opacity: 0.6;">삭제</button>
+                        </div>
                     </div>
-                    <div style="display: flex; gap: 8px; align-items: center;">
-                         <button onclick="likeComment('${docId}', ${idx})" style="background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 0.8rem;">👍 ${comment.likes || 0}</button>
-                         <button onclick="deleteComment('${docId}', ${idx})" style="background: none; border: none; color: var(--red); cursor: pointer; font-size: 0.75rem; opacity: 0.6;">삭제</button>
-                    </div>
+                    <div style="color: var(--white); font-size: 0.9rem; line-height: 1.5;">${comment.content}</div>
                 </div>
-                <div style="color: var(--white); font-size: 0.9rem; line-height: 1.5;">${comment.content}</div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
 
         postCard.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 25px;">
@@ -394,14 +399,17 @@ onSnapshot(boardQuery, (snapshot) => {
             <p style="color: var(--text-dim); font-size: 1rem; line-height: 1.8; white-space: pre-wrap; margin-bottom: 30px; border-bottom: 1px solid var(--glass-border); padding-bottom: 30px;">${post.content}</p>
             
             <div style="margin-bottom: 20px;">
-                <h5 style="color: var(--white); font-size: 1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
-                     댓글 <span style="color: var(--orange); font-weight: 800;">${(post.comments || []).length}</span>
-                </h5>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h5 style="color: var(--white); font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                         댓글 <span style="color: var(--orange); font-weight: 800;">${(post.comments || []).length}</span>
+                    </h5>
+                    <button onclick="toggleCommentForm('${docId}')" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--white); padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem;">댓글 쓰기</button>
+                </div>
                 <div id="comments-${docId}">${commentsHtml}</div>
             </div>
 
-            <!-- 댓글 작성 폼 -->
-            <div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border);">
+            <!-- 댓글 작성 폼 (기본 숨김) -->
+            <div id="comment-form-${docId}" style="display: none; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border); margin-top: 15px; animation: slideDown 0.3s ease-out;">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
                     <input type="text" id="comment-name-${docId}" placeholder="이름" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; color: white; font-size: 0.8rem; outline: none;">
                     <input type="password" id="comment-pw-${docId}" placeholder="비밀번호" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; color: white; font-size: 0.8rem; outline: none;">
@@ -416,14 +424,36 @@ onSnapshot(boardQuery, (snapshot) => {
     });
 });
 
-// 추천 및 댓글 관련 함수 추가
+function toggleCommentForm(postId) {
+    const form = document.getElementById(`comment-form-${postId}`);
+    if (form) {
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        if (form.style.display === 'block') {
+            form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+}
+
+// 추천 토글 기능 함수 추가
 async function likePost(postId) {
     const { getDoc } = await import("https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js");
     const postRef = doc(db, "posts", postId);
     const snap = await getDoc(postRef);
-    if (snap.exists()) {
-        await updateDoc(postRef, { likes: (snap.data().likes || 0) + 1 });
+    if (!snap.exists()) return;
+
+    let likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+    let currentLikes = snap.data().likes || 0;
+    
+    if (likedPosts.includes(postId)) {
+        // 이미 추천함 -> 추천 취소
+        await updateDoc(postRef, { likes: Math.max(0, currentLikes - 1) });
+        likedPosts = likedPosts.filter(id => id !== postId);
+    } else {
+        // 새로 추천
+        await updateDoc(postRef, { likes: currentLikes + 1 });
+        likedPosts.push(postId);
     }
+    localStorage.setItem('liked_posts', JSON.stringify(likedPosts));
 }
 
 async function addComment(postId) {
@@ -455,11 +485,24 @@ async function likeComment(postId, commentIdx) {
     const { getDoc } = await import("https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js");
     const postRef = doc(db, "posts", postId);
     const snap = await getDoc(postRef);
-    if (snap.exists()) {
-        const comments = snap.data().comments;
+    if (!snap.exists()) return;
+
+    let likedComments = JSON.parse(localStorage.getItem('liked_comments') || '[]');
+    const commentKey = `${postId}_${commentIdx}`;
+    const comments = snap.data().comments;
+
+    if (likedComments.includes(commentKey)) {
+        // 추천 취소
+        comments[commentIdx].likes = Math.max(0, (comments[commentIdx].likes || 0) - 1);
+        likedComments = likedComments.filter(key => key !== commentKey);
+    } else {
+        // 새로 추천
         comments[commentIdx].likes = (comments[commentIdx].likes || 0) + 1;
-        await updateDoc(postRef, { comments });
+        likedComments.push(commentKey);
     }
+    
+    await updateDoc(postRef, { comments });
+    localStorage.setItem('liked_comments', JSON.stringify(likedComments));
 }
 
 async function deleteComment(postId, commentIdx) {
@@ -491,6 +534,7 @@ window.deletePost = deletePost;
 window.editPost = editPost;
 window.likePost = likePost;
 window.addComment = addComment;
+window.toggleCommentForm = toggleCommentForm;
 window.likeComment = likeComment;
 window.deleteComment = deleteComment;
 window.toggleChat = toggleChat;
