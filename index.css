@@ -564,6 +564,10 @@ section.active .grid-3-col {
   transform: translateY(-8px);
   border-color: rgba(255, 92, 0, 0.3);
 }
+#board-form input, #board-form textarea {
+  color: var(--white);
+}
+
 #board-form input:focus, #board-form textarea:focus {
   background: rgba(255, 255, 255, 0.08) !important;
   border-color: var(--orange) !important;
@@ -656,6 +660,13 @@ section.active .grid-3-col {
   background: #ffffff !important;
   border: 1px solid #e1e4e8 !important;
   box-shadow: 0 15px 35px rgba(0,0,0,0.06) !important;
+}
+
+[data-theme="light"] #board-form input,
+[data-theme="light"] #board-form textarea {
+  background: #f8f9fa !important;
+  border: 1px solid #e1e4e8 !important;
+  color: #111111 !important;
 }
 
 [data-theme="light"] section#curriculum,
