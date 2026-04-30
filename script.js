@@ -303,7 +303,24 @@ async function editPost(postId) {
 
 // 실시간 게시글 리스너
 const urlParams = new URLSearchParams(window.location.search);
-const isAdmin = urlParams.get('admin') === 'true'; // 주소창에 ?admin=true 가 있는지 확인
+const passwordFromUrl = urlParams.get('admin');
+
+// [중요] 관리자 비밀번호 설정 (원하시는 비밀번호로 여기서 바꾸세요)
+const ADMIN_PASSWORD = "1234"; 
+
+let isAdmin = sessionStorage.getItem('isAdmin') === 'true';
+
+if (passwordFromUrl === 'true' && !isAdmin) {
+    const inputPassword = prompt('관리자 비밀번호를 입력하세요:');
+    if (inputPassword === ADMIN_PASSWORD) {
+        isAdmin = true;
+        sessionStorage.setItem('isAdmin', 'true');
+        alert('관리자 모드로 접속되었습니다.');
+    } else {
+        alert('비밀번호가 일치하지 않습니다.');
+        window.location.href = window.location.pathname; // 주소창에서 admin=true 제거
+    }
+}
 
 const boardQuery = query(postsCol, orderBy("timestamp", "desc"));
 onSnapshot(boardQuery, (snapshot) => {
