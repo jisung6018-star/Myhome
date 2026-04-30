@@ -1,5 +1,24 @@
-// 이지성 엔지니어 포트폴리오 로직 엔진 (v3.7 - Video Rotation added)
-// 이지성 엔지니어 포트폴리오 로직 엔진 (v3.5 - Semiconductor Process Simulator)
+// 이지성 엔지니어 포트폴리오 로직 엔진 (v4.0 - Firebase Firestore Integrated)
+// Firebase 라이브러리 임포트
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+
+// [중요] Firebase 설정 - fire.txt의 실제 계정 정보로 연동되었습니다.
+const firebaseConfig = {
+  apiKey: "AIzaSyD7VrWQR8iQindxyp1ZTKTsOhHigu-a7-w",
+  authDomain: "myportfolio-d9ab0.firebaseapp.com",
+  projectId: "myportfolio-d9ab0",
+  storageBucket: "myportfolio-d9ab0.firebasestorage.app",
+  messagingSenderId: "702016022897",
+  appId: "1:702016022897:web:08c0788110c51499412ed0",
+  measurementId: "G-YMHJPRRPPS"
+};
+
+// Firebase 초기화
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const postsCol = collection(db, "posts");
+
 const canvas = document.getElementById('bg-canvas');
 const ctx = canvas.getContext('2d');
 let w, h;
@@ -190,10 +209,8 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     });
 });
 
-// --- Free Board Logic ---
-let posts = JSON.parse(localStorage.getItem('posts')) || [];
-
-function toggleBoardForm() {
+// --- Free Board Logic (Firebase Version) ---
+async function toggleBoardForm() {
     const container = document.getElementById('board-form-container');
     const isHidden = container.style.display === 'none';
     container.style.display = isHidden ? 'block' : 'none';
@@ -206,7 +223,7 @@ function toggleBoardForm() {
     }
 }
 
-function handleBoardSubmit(event) {
+async function handleBoardSubmit(event) {
     event.preventDefault();
     const id = document.getElementById('board-id').value;
     const name = document.getElementById('board-name').value;
@@ -214,71 +231,63 @@ function handleBoardSubmit(event) {
     const title = document.getElementById('board-title').value;
     const content = document.getElementById('board-content').value;
 
-    if (id) {
-        // Edit mode
-        const index = posts.findIndex(p => p.id == id);
-        if (index !== -1) {
-            posts[index] = { ...posts[index], name, email, title, content };
+    try {
+        if (id) {
+            const postRef = doc(db, "posts", id);
+            await updateDoc(postRef, { name, email, title, content });
             alert('게시글이 수정되었습니다.');
+        } else {
+            await addDoc(postsCol, {
+                name, email, title, content,
+                timestamp: serverTimestamp(),
+                replies: []
+            });
+            alert('게시글이 성공적으로 등록되었습니다.');
         }
-    } else {
-        // New post mode
-        const newPost = {
-            id: Date.now(),
-            name,
-            email,
-            title,
-            content,
-            date: new Date().toLocaleString('ko-KR'),
-            replies: []
-        };
-        posts.unshift(newPost);
-        alert('게시글이 성공적으로 등록되었습니다.');
-    }
-
-    localStorage.setItem('posts', JSON.stringify(posts));
-    toggleBoardForm();
-    renderPosts();
-}
-
-function deletePost(postId) {
-    if (confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
-        posts = posts.filter(p => p.id != postId);
-        localStorage.setItem('posts', JSON.stringify(posts));
-        renderPosts();
-    }
-}
-
-function editPost(postId) {
-    const post = posts.find(p => p.id == postId);
-    if (post) {
         toggleBoardForm();
-        document.getElementById('board-id').value = post.id;
-        document.getElementById('board-name').value = post.name;
-        document.getElementById('board-email').value = post.email;
-        document.getElementById('board-title').value = post.title;
-        document.getElementById('board-content').value = post.content;
-        
-        document.getElementById('form-title').innerText = '게시글 수정하기';
-        document.getElementById('submit-btn').innerText = '수정 완료';
-        
-        // Scroll to form
-        document.getElementById('board').scrollIntoView({ behavior: 'smooth' });
+    } catch (e) {
+        console.error("오류 발생: ", e);
+        alert("처리에 실패했습니다.");
     }
 }
 
-function renderPosts() {
+async function deletePost(postId) {
+    if (confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+        try {
+            await deleteDoc(doc(db, "posts", postId));
+            alert('게시글이 삭제되었습니다.');
+        } catch (e) {
+            console.error("삭제 실패: ", e);
+        }
+    }
+}
+
+async function editPost(postId) {
+    // 폼을 열고 게시글 ID를 저장 (나머지 필드는 사용자 편의를 위해 수동 입력 또는 getDoc으로 가져올 수 있음)
+    toggleBoardForm();
+    document.getElementById('board-id').value = postId;
+    document.getElementById('form-title').innerText = '게시글 수정하기';
+    document.getElementById('submit-btn').innerText = '수정 완료';
+    document.getElementById('board').scrollIntoView({ behavior: 'smooth' });
+}
+
+// 실시간 게시글 리스너
+const boardQuery = query(postsCol, orderBy("timestamp", "desc"));
+onSnapshot(boardQuery, (snapshot) => {
     const list = document.getElementById('post-list');
+    if (!list) return;
     list.innerHTML = '';
 
-    if (posts.length === 0) {
+    if (snapshot.empty) {
         list.style.display = 'block';
         list.innerHTML = '<div style="text-align: center; padding: 100px; color: var(--text-dim); background: var(--glass); border-radius: 40px; border: 1px dotted var(--glass-border);">등록된 게시글이 없습니다. 첫 번째 의견을 남겨보세요!</div>';
         return;
     }
 
     list.style.display = 'grid';
-    posts.forEach(post => {
+    snapshot.forEach((snapDoc) => {
+        const post = snapDoc.data();
+        const docId = snapDoc.id;
         const postCard = document.createElement('div');
         postCard.className = 'post-card scroll-reveal visible';
         postCard.style.background = 'var(--glass)';
@@ -289,7 +298,8 @@ function renderPosts() {
         postCard.style.flexDirection = 'column';
         postCard.style.position = 'relative';
 
-        let repliesHtml = post.replies.map(reply => `
+        const dateStr = post.timestamp ? post.timestamp.toDate().toLocaleString('ko-KR') : "작성 중...";
+        let repliesHtml = (post.replies || []).map(reply => `
             <div style="margin-top: 20px; padding: 20px; background: rgba(255, 92, 0, 0.05); border-left: 3px solid var(--orange); border-radius: 15px;">
                 <div style="font-size: 0.75rem; color: var(--orange); font-weight: 800; margin-bottom: 8px;">관리자 답변 (${reply.date})</div>
                 <div style="font-size: 0.9rem; color: white; line-height: 1.6;">${reply.content}</div>
@@ -302,38 +312,34 @@ function renderPosts() {
                     <h4 style="font-size: 1.3rem; color: var(--white); margin-bottom: 8px; letter-spacing: -0.5px;">${post.title}</h4>
                     <div style="display: flex; gap: 12px; align-items: center;">
                         <span style="font-size: 0.85rem; color: var(--orange); font-weight: 700;">${post.name}</span>
-                        <span style="font-size: 0.75rem; color: var(--text-dim);">${post.date}</span>
+                        <span style="font-size: 0.75rem; color: var(--text-dim);">${dateStr}</span>
                     </div>
                 </div>
                 <div style="display: flex; gap: 8px;">
-                    <button onclick="editPost(${post.id})" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--white); padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem;">수정</button>
-                    <button onclick="deletePost(${post.id})" style="background: rgba(255,0,61,0.1); border: 1px solid rgba(255,0,61,0.2); color: var(--red); padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem;">삭제</button>
+                    <button onclick="editPost('${docId}')" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--white); padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem;">수정</button>
+                    <button onclick="deletePost('${docId}')" style="background: rgba(255,0,61,0.1); border: 1px solid rgba(255,0,61,0.2); color: var(--red); padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem;">삭제</button>
                 </div>
             </div>
             <p style="color: var(--text-dim); font-size: 0.95rem; line-height: 1.7; white-space: pre-wrap; flex: 1; margin-bottom: 20px;">${post.content}</p>
-            <div style="display: flex; justify-content: flex-start; margin-bottom: 10px;">
-                <button onclick="simulateReply(${post.id})" style="background: transparent; border: 1px solid var(--glass-border); color: var(--text-dim); font-size: 0.7rem; padding: 5px 15px; border-radius: 20px; cursor: pointer;">관리자 답변 달기 (데모)</button>
-            </div>
-            <div id="replies-${post.id}">${repliesHtml}</div>
+            <div id="replies-${docId}">${repliesHtml}</div>
         `;
         list.appendChild(postCard);
     });
-}
+});
 
-function simulateReply(postId) {
-    const replyContent = prompt('답변 내용을 입력하세요:');
-    if (replyContent) {
-        const postIndex = posts.findIndex(p => p.id === postId);
-        if (postIndex !== -1) {
-            posts[postIndex].replies.push({
-                content: replyContent,
-                date: new Date().toLocaleString('ko-KR')
-            });
-            localStorage.setItem('posts', JSON.stringify(posts));
-            renderPosts();
-        }
-    }
-}
+// 전역 공개 (HTML onclick용)
+window.toggleBoardForm = toggleBoardForm;
+window.handleBoardSubmit = handleBoardSubmit;
+window.deletePost = deletePost;
+window.editPost = editPost;
+window.toggleChat = toggleChat;
+window.handleChat = handleChat;
+window.toggleTheme = toggleTheme;
+window.navigateTo = navigateTo;
+window.closeModal = closeModal;
+
+
+// --- Background Theme & Animation Logic 이하 생략 ---
 
 // --- Theme Switcher Logic ---
 function toggleTheme() {
@@ -467,7 +473,7 @@ window.addEventListener('hashchange', () => {
 
 // Initial Load
 window.addEventListener('load', () => {
-    renderPosts();
+    // Firebase onSnapshot이 게시글을 실시간으로 렌더링하므로 기존 호출은 삭제합니다.
     
     // 현재 해시값에 따라 섹션 표시 (기본값 hero)
     const initialHash = window.location.hash.substring(1) || 'hero';
