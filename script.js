@@ -241,7 +241,8 @@ async function handleBoardSubmit(event) {
             await addDoc(postsCol, {
                 name, email, title, content, password,
                 timestamp: serverTimestamp(),
-                replies: []
+                likes: 0,
+                comments: []
             });
             alert('게시글이 성공적으로 등록되었습니다.');
         }
@@ -339,7 +340,6 @@ onSnapshot(boardQuery, (snapshot) => {
         const post = snapDoc.data();
         const docId = snapDoc.id;
         const postCard = document.createElement('div');
-        // ... (기존 스타일 설정 생략)
         postCard.className = 'post-card scroll-reveal visible';
         postCard.style.background = 'var(--glass)';
         postCard.style.padding = '35px';
@@ -351,44 +351,148 @@ onSnapshot(boardQuery, (snapshot) => {
 
         const dateStr = post.timestamp ? post.timestamp.toDate().toLocaleString('ko-KR') : "작성 중...";
         
-        // 버튼 노출 (모두에게 보이지만 클릭 시 비번 체크)
-        const buttons = `
-            <div style="display: flex; gap: 8px;">
-                <button onclick="editPost('${docId}')" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--white); padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem;">수정</button>
-                <button onclick="deletePost('${docId}')" style="background: rgba(255,0,61,0.1); border: 1px solid rgba(255,0,61,0.2); color: var(--red); padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem;">삭제</button>
+        // 게시글 추천/수정/삭제 버튼
+        const postButtons = `
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button onclick="likePost('${docId}')" style="background: rgba(255, 92, 0, 0.1); border: 1px solid var(--orange); color: var(--orange); padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; gap: 6px;">
+                    👍 ${post.likes || 0}
+                </button>
+                <button onclick="editPost('${docId}')" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--white); padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.8rem;">수정</button>
+                <button onclick="deletePost('${docId}')" style="background: rgba(255,0,61,0.1); border: 1px solid rgba(255,0,61,0.2); color: var(--red); padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.8rem;">삭제</button>
             </div>
         `;
 
-        let repliesHtml = (post.replies || []).map(reply => `
-            <div style="margin-top: 20px; padding: 20px; background: rgba(255, 92, 0, 0.05); border-left: 3px solid var(--orange); border-radius: 15px;">
-                <div style="font-size: 0.75rem; color: var(--orange); font-weight: 800; margin-bottom: 8px;">관리자 답변 (${reply.date})</div>
-                <div style="font-size: 0.9rem; color: white; line-height: 1.6;">${reply.content}</div>
+        // 댓글 목록 렌더링
+        let commentsHtml = (post.comments || []).map((comment, idx) => `
+            <div style="margin-top: 15px; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 18px; border: 1px solid var(--glass-border);">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                    <div>
+                        <span style="color: var(--orange); font-weight: 800; font-size: 0.85rem;">${comment.author}</span>
+                        <span style="color: var(--text-dim); font-size: 0.75rem; margin-left: 10px;">${comment.date}</span>
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                         <button onclick="likeComment('${docId}', ${idx})" style="background: none; border: none; color: var(--text-dim); cursor: pointer; font-size: 0.8rem;">👍 ${comment.likes || 0}</button>
+                         <button onclick="deleteComment('${docId}', ${idx})" style="background: none; border: none; color: var(--red); cursor: pointer; font-size: 0.75rem; opacity: 0.6;">삭제</button>
+                    </div>
+                </div>
+                <div style="color: var(--white); font-size: 0.9rem; line-height: 1.5;">${comment.content}</div>
             </div>
         `).join('');
 
         postCard.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 25px;">
                 <div style="flex: 1;">
-                    <h4 style="font-size: 1.3rem; color: var(--white); margin-bottom: 8px; letter-spacing: -0.5px;">${post.title}</h4>
+                    <h4 style="font-size: 1.4rem; color: var(--white); margin-bottom: 10px; letter-spacing: -0.8px; font-weight: 800;">${post.title}</h4>
                     <div style="display: flex; gap: 12px; align-items: center;">
-                        <span style="font-size: 0.85rem; color: var(--orange); font-weight: 700;">${post.name}</span>
-                        <span style="font-size: 0.75rem; color: var(--text-dim);">${dateStr}</span>
+                        <span style="font-size: 0.9rem; color: var(--orange); font-weight: 700;">${post.name}</span>
+                        <div style="width: 3px; height: 3px; background: var(--glass-border); border-radius: 50%;"></div>
+                        <span style="font-size: 0.8rem; color: var(--text-dim);">${dateStr}</span>
                     </div>
                 </div>
-                ${buttons}
+                ${postButtons}
             </div>
-            <p style="color: var(--text-dim); font-size: 0.95rem; line-height: 1.7; white-space: pre-wrap; flex: 1; margin-bottom: 20px;">${post.content}</p>
-            <div id="replies-${docId}">${repliesHtml}</div>
+            <p style="color: var(--text-dim); font-size: 1rem; line-height: 1.8; white-space: pre-wrap; margin-bottom: 30px; border-bottom: 1px solid var(--glass-border); padding-bottom: 30px;">${post.content}</p>
+            
+            <div style="margin-bottom: 20px;">
+                <h5 style="color: var(--white); font-size: 1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+                     댓글 <span style="color: var(--orange); font-weight: 800;">${(post.comments || []).length}</span>
+                </h5>
+                <div id="comments-${docId}">${commentsHtml}</div>
+            </div>
+
+            <!-- 댓글 작성 폼 -->
+            <div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border);">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <input type="text" id="comment-name-${docId}" placeholder="이름" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; color: white; font-size: 0.8rem; outline: none;">
+                    <input type="password" id="comment-pw-${docId}" placeholder="비밀번호" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; color: white; font-size: 0.8rem; outline: none;">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <textarea id="comment-content-${docId}" placeholder="댓글을 입력하세요..." style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; color: white; font-size: 0.85rem; outline: none; min-height: 44px; height: 44px; resize: none;"></textarea>
+                    <button onclick="addComment('${docId}')" style="background: var(--orange); color: white; border: none; padding: 0 15px; border-radius: 10px; font-weight: 800; cursor: pointer; height: 44px;">등록</button>
+                </div>
+            </div>
         `;
         list.appendChild(postCard);
     });
 });
+
+// 추천 및 댓글 관련 함수 추가
+async function likePost(postId) {
+    const { getDoc } = await import("https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js");
+    const postRef = doc(db, "posts", postId);
+    const snap = await getDoc(postRef);
+    if (snap.exists()) {
+        await updateDoc(postRef, { likes: (snap.data().likes || 0) + 1 });
+    }
+}
+
+async function addComment(postId) {
+    const name = document.getElementById(`comment-name-${postId}`).value;
+    const pw = document.getElementById(`comment-pw-${postId}`).value;
+    const content = document.getElementById(`comment-content-${postId}`).value;
+
+    if (!name || !pw || !content) return alert('모든 항목을 입력해 주세요.');
+
+    const { getDoc } = await import("https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js");
+    const postRef = doc(db, "posts", postId);
+    const snap = await getDoc(postRef);
+    
+    if (snap.exists()) {
+        const comments = snap.data().comments || [];
+        comments.push({
+            author: name,
+            password: pw,
+            content: content,
+            likes: 0,
+            date: new Date().toLocaleDateString('ko-KR') + " " + new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+        });
+        await updateDoc(postRef, { comments });
+        alert('댓글이 등록되었습니다.');
+    }
+}
+
+async function likeComment(postId, commentIdx) {
+    const { getDoc } = await import("https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js");
+    const postRef = doc(db, "posts", postId);
+    const snap = await getDoc(postRef);
+    if (snap.exists()) {
+        const comments = snap.data().comments;
+        comments[commentIdx].likes = (comments[commentIdx].likes || 0) + 1;
+        await updateDoc(postRef, { comments });
+    }
+}
+
+async function deleteComment(postId, commentIdx) {
+    const { getDoc } = await import("https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js");
+    const postRef = doc(db, "posts", postId);
+    const snap = await getDoc(postRef);
+    
+    if (snap.exists()) {
+        const comments = snap.data().comments;
+        
+        // 관리자가 아니고 작성자 비번도 틀리면 불가
+        if (!isAdmin) {
+            const pw = prompt('댓글 작성 시 설정한 비밀번호를 입력하세요:');
+            if (pw !== comments[commentIdx].password) return alert('비밀번호가 일치하지 않습니다.');
+        }
+
+        if (confirm('댓글을 삭제하시겠습니까?')) {
+            comments.splice(commentIdx, 1);
+            await updateDoc(postRef, { comments });
+            alert('댓글이 삭제되었습니다.');
+        }
+    }
+}
 
 // 전역 공개 (HTML onclick용)
 window.toggleBoardForm = toggleBoardForm;
 window.handleBoardSubmit = handleBoardSubmit;
 window.deletePost = deletePost;
 window.editPost = editPost;
+window.likePost = likePost;
+window.addComment = addComment;
+window.likeComment = likeComment;
+window.deleteComment = deleteComment;
 window.toggleChat = toggleChat;
 window.handleChat = handleChat;
 window.toggleTheme = toggleTheme;
