@@ -272,6 +272,9 @@ async function editPost(postId) {
 }
 
 // 실시간 게시글 리스너
+const urlParams = new URLSearchParams(window.location.search);
+const isAdmin = urlParams.get('admin') === 'true'; // 주소창에 ?admin=true 가 있는지 확인
+
 const boardQuery = query(postsCol, orderBy("timestamp", "desc"));
 onSnapshot(boardQuery, (snapshot) => {
     const list = document.getElementById('post-list');
@@ -289,6 +292,7 @@ onSnapshot(boardQuery, (snapshot) => {
         const post = snapDoc.data();
         const docId = snapDoc.id;
         const postCard = document.createElement('div');
+        // ... (기존 스타일 설정 생략)
         postCard.className = 'post-card scroll-reveal visible';
         postCard.style.background = 'var(--glass)';
         postCard.style.padding = '35px';
@@ -299,6 +303,15 @@ onSnapshot(boardQuery, (snapshot) => {
         postCard.style.position = 'relative';
 
         const dateStr = post.timestamp ? post.timestamp.toDate().toLocaleString('ko-KR') : "작성 중...";
+        
+        // 관리자용 버튼 (isAdmin이 true일 때만 노출)
+        const adminButtons = isAdmin ? `
+            <div style="display: flex; gap: 8px;">
+                <button onclick="editPost('${docId}')" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--white); padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem;">수정</button>
+                <button onclick="deletePost('${docId}')" style="background: rgba(255,0,61,0.1); border: 1px solid rgba(255,0,61,0.2); color: var(--red); padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem;">삭제</button>
+            </div>
+        ` : '';
+
         let repliesHtml = (post.replies || []).map(reply => `
             <div style="margin-top: 20px; padding: 20px; background: rgba(255, 92, 0, 0.05); border-left: 3px solid var(--orange); border-radius: 15px;">
                 <div style="font-size: 0.75rem; color: var(--orange); font-weight: 800; margin-bottom: 8px;">관리자 답변 (${reply.date})</div>
@@ -315,10 +328,7 @@ onSnapshot(boardQuery, (snapshot) => {
                         <span style="font-size: 0.75rem; color: var(--text-dim);">${dateStr}</span>
                     </div>
                 </div>
-                <div style="display: flex; gap: 8px;">
-                    <button onclick="editPost('${docId}')" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--white); padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem;">수정</button>
-                    <button onclick="deletePost('${docId}')" style="background: rgba(255,0,61,0.1); border: 1px solid rgba(255,0,61,0.2); color: var(--red); padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem;">삭제</button>
-                </div>
+                ${adminButtons}
             </div>
             <p style="color: var(--text-dim); font-size: 0.95rem; line-height: 1.7; white-space: pre-wrap; flex: 1; margin-bottom: 20px;">${post.content}</p>
             <div id="replies-${docId}">${repliesHtml}</div>
