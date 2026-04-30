@@ -530,17 +530,23 @@
                     <form id="board-form" onsubmit="handleBoardSubmit(event)"
                         style="display: flex; flex-direction: column; gap: 20px;">
                         <input type="hidden" id="board-id">
-                        <div class="board-form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <div class="board-form-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px;">
                             <div>
                                 <label
                                     style="display: block; font-size: 0.8rem; color: var(--orange); font-weight: 800; margin-bottom: 8px;">이름</label>
-                                <input type="text" id="board-name" required placeholder="성함을 입력하세요"
+                                <input type="text" id="board-name" required placeholder="성함"
                                     style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 15px 20px; border-radius: 15px; color: white; outline: none;">
                             </div>
                             <div>
                                 <label
                                     style="display: block; font-size: 0.8rem; color: var(--orange); font-weight: 800; margin-bottom: 8px;">이메일</label>
-                                <input type="email" id="board-email" required placeholder="example@email.com"
+                                <input type="email" id="board-email" required placeholder="email"
+                                    style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 15px 20px; border-radius: 15px; color: white; outline: none;">
+                            </div>
+                            <div>
+                                <label
+                                    style="display: block; font-size: 0.8rem; color: var(--orange); font-weight: 800; margin-bottom: 8px;">비밀번호 (수정/삭제용)</label>
+                                <input type="password" id="board-pw" required placeholder="****"
                                     style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 15px 20px; border-radius: 15px; color: white; outline: none;">
                             </div>
                         </div>

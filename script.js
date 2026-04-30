@@ -230,21 +230,23 @@ async function handleBoardSubmit(event) {
     const email = document.getElementById('board-email').value;
     const title = document.getElementById('board-title').value;
     const content = document.getElementById('board-content').value;
+    const password = document.getElementById('board-pw').value;
 
     try {
         if (id) {
             const postRef = doc(db, "posts", id);
-            await updateDoc(postRef, { name, email, title, content });
+            await updateDoc(postRef, { name, email, title, content, password });
             alert('게시글이 수정되었습니다.');
         } else {
             await addDoc(postsCol, {
-                name, email, title, content,
+                name, email, title, content, password,
                 timestamp: serverTimestamp(),
                 replies: []
             });
             alert('게시글이 성공적으로 등록되었습니다.');
         }
         toggleBoardForm();
+        document.getElementById('board-pw').value = ''; // 비밀번호 필드 초기화
     } catch (e) {
         console.error("오류 발생: ", e);
         alert("처리에 실패했습니다.");
@@ -252,6 +254,18 @@ async function handleBoardSubmit(event) {
 }
 
 async function deletePost(postId) {
+    // 관리자이거나 비밀번호가 일치하면 삭제 허용
+    if (!isAdmin) {
+        const password = prompt('작성 시 설정한 비밀번호를 입력하세요:');
+        if (!password) return;
+        
+        const { getDoc } = await import("https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js");
+        const docSnap = await getDoc(doc(db, "posts", postId));
+        if (docSnap.exists() && docSnap.data().password !== password) {
+            return alert('비밀번호가 일치하지 않습니다.');
+        }
+    }
+
     if (confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
         try {
             await deleteDoc(doc(db, "posts", postId));
@@ -263,7 +277,23 @@ async function deletePost(postId) {
 }
 
 async function editPost(postId) {
-    // 폼을 열고 게시글 ID를 저장 (나머지 필드는 사용자 편의를 위해 수동 입력 또는 getDoc으로 가져올 수 있음)
+    if (!isAdmin) {
+        const password = prompt('작성 시 설정한 비밀번호를 입력하세요:');
+        if (!password) return;
+
+        const { getDoc } = await import("https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js");
+        const docSnap = await getDoc(doc(db, "posts", postId));
+        if (docSnap.exists() && docSnap.data().password !== password) {
+            return alert('비밀번호가 일치하지 않습니다.');
+        }
+        
+        const post = docSnap.data();
+        document.getElementById('board-name').value = post.name;
+        document.getElementById('board-email').value = post.email;
+        document.getElementById('board-title').value = post.title;
+        document.getElementById('board-content').value = post.content;
+    }
+
     toggleBoardForm();
     document.getElementById('board-id').value = postId;
     document.getElementById('form-title').innerText = '게시글 수정하기';
@@ -304,13 +334,13 @@ onSnapshot(boardQuery, (snapshot) => {
 
         const dateStr = post.timestamp ? post.timestamp.toDate().toLocaleString('ko-KR') : "작성 중...";
         
-        // 관리자용 버튼 (isAdmin이 true일 때만 노출)
-        const adminButtons = isAdmin ? `
+        // 버튼 노출 (모두에게 보이지만 클릭 시 비번 체크)
+        const buttons = `
             <div style="display: flex; gap: 8px;">
                 <button onclick="editPost('${docId}')" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--white); padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem;">수정</button>
                 <button onclick="deletePost('${docId}')" style="background: rgba(255,0,61,0.1); border: 1px solid rgba(255,0,61,0.2); color: var(--red); padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem;">삭제</button>
             </div>
-        ` : '';
+        `;
 
         let repliesHtml = (post.replies || []).map(reply => `
             <div style="margin-top: 20px; padding: 20px; background: rgba(255, 92, 0, 0.05); border-left: 3px solid var(--orange); border-radius: 15px;">
@@ -328,7 +358,7 @@ onSnapshot(boardQuery, (snapshot) => {
                         <span style="font-size: 0.75rem; color: var(--text-dim);">${dateStr}</span>
                     </div>
                 </div>
-                ${adminButtons}
+                ${buttons}
             </div>
             <p style="color: var(--text-dim); font-size: 0.95rem; line-height: 1.7; white-space: pre-wrap; flex: 1; margin-bottom: 20px;">${post.content}</p>
             <div id="replies-${docId}">${repliesHtml}</div>
