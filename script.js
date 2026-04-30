@@ -367,7 +367,7 @@ onSnapshot(boardQuery, (snapshot) => {
             
             const postButtons = `
                 <div style="display: flex; gap: 10px; align-items: center;">
-                    <button onclick="likePost('${docId}')" style="background: ${isPostLiked ? 'var(--orange)' : 'rgba(255, 92, 0, 0.1)'}; border: 1px solid var(--orange); color: ${isPostLiked ? 'white' : 'var(--orange)'}; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; gap: 6px; transition: 0.3s;">
+                    <button onclick="likePost('${docId}')" style="background: rgba(255,255,255,0.05); border: 1px solid ${isPostLiked ? 'var(--orange)' : 'var(--glass-border)'}; color: ${isPostLiked ? 'var(--orange)' : 'var(--white)'}; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; gap: 6px; transition: 0.3s;">
                         👍 ${likesCount}
                     </button>
                     <button onclick="editPost('${docId}')" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--white); padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.8rem;">수정</button>
@@ -389,7 +389,7 @@ onSnapshot(boardQuery, (snapshot) => {
                                 <span style="color: var(--text-dim); font-size: 0.75rem; margin-left: 10px;">${comment.date || ''}</span>
                             </div>
                             <div style="display: flex; gap: 12px; align-items: center;">
-                                 <button onclick="likeComment('${docId}', ${idx})" style="background: none; border: none; color: ${isCommentLiked ? 'var(--orange)' : 'var(--text-dim)'}; cursor: pointer; font-size: 0.8rem; font-weight: ${isCommentLiked ? '800' : '400'};">👍 ${comment.likes || 0}</button>
+                                 <button onclick="likeComment('${docId}', ${idx})" style="background: none; border: none; color: ${isCommentLiked ? 'var(--orange)' : 'var(--text-dim)'}; cursor: pointer; font-size: 0.8rem; font-weight: ${isCommentLiked ? '800' : '400'}; transition: 0.2s;">👍 ${comment.likes || 0}</button>
                                  <button onclick="deleteComment('${docId}', ${idx})" style="background: none; border: none; color: var(--red); cursor: pointer; font-size: 0.75rem; opacity: 0.6;">삭제</button>
                             </div>
                         </div>
