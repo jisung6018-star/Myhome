@@ -337,90 +337,107 @@ onSnapshot(boardQuery, (snapshot) => {
 
     list.style.display = 'grid';
     snapshot.forEach((snapDoc) => {
-        const post = snapDoc.data();
-        const docId = snapDoc.id;
-        const postCard = document.createElement('div');
-        postCard.className = 'post-card scroll-reveal visible';
-        postCard.style.background = 'var(--glass)';
-        postCard.style.padding = '35px';
-        postCard.style.borderRadius = '35px';
-        postCard.style.border = '1px solid var(--glass-border)';
-        postCard.style.display = 'flex';
-        postCard.style.flexDirection = 'column';
-        postCard.style.position = 'relative';
+        try {
+            const post = snapDoc.data();
+            const docId = snapDoc.id;
+            const postCard = document.createElement('div');
+            postCard.className = 'post-card scroll-reveal visible';
+            postCard.style.background = 'var(--glass)';
+            postCard.style.padding = '35px';
+            postCard.style.borderRadius = '35px';
+            postCard.style.border = '1px solid var(--glass-border)';
+            postCard.style.display = 'flex';
+            postCard.style.flexDirection = 'column';
+            postCard.style.position = 'relative';
 
-        // 1. 게시글 추천/수정/삭제 버튼
-        const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
-        const isPostLiked = likedPosts.includes(docId);
-        
-        const postButtons = `
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <button onclick="likePost('${docId}')" style="background: ${isPostLiked ? 'var(--orange)' : 'rgba(255, 92, 0, 0.1)'}; border: 1px solid var(--orange); color: ${isPostLiked ? 'white' : 'var(--orange)'}; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; gap: 6px; transition: 0.3s;">
-                    👍 ${post.likes || 0}
-                </button>
-                <button onclick="editPost('${docId}')" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--white); padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.8rem;">수정</button>
-                <button onclick="deletePost('${docId}')" style="background: rgba(255,0,61,0.1); border: 1px solid rgba(255,0,61,0.2); color: var(--red); padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.8rem;">삭제</button>
-            </div>
-        `;
-
-        // 2. 댓글 목록 렌더링
-        const likedComments = JSON.parse(localStorage.getItem('liked_comments') || '[]');
-        let commentsHtml = (post.comments || []).map((comment, idx) => {
-            const isCommentLiked = likedComments.includes(`${docId}_${idx}`);
-            return `
-                <div style="margin-top: 15px; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 18px; border: 1px solid var(--glass-border);">
-                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
-                        <div>
-                            <span style="color: var(--orange); font-weight: 800; font-size: 0.85rem;">${comment.author}</span>
-                            <span style="color: var(--text-dim); font-size: 0.75rem; margin-left: 10px;">${comment.date}</span>
-                        </div>
-                        <div style="display: flex; gap: 12px; align-items: center;">
-                             <button onclick="likeComment('${docId}', ${idx})" style="background: none; border: none; color: ${isCommentLiked ? 'var(--orange)' : 'var(--text-dim)'}; cursor: pointer; font-size: 0.8rem; font-weight: ${isCommentLiked ? '800' : '400'};">👍 ${comment.likes || 0}</button>
-                             <button onclick="deleteComment('${docId}', ${idx})" style="background: none; border: none; color: var(--red); cursor: pointer; font-size: 0.75rem; opacity: 0.6;">삭제</button>
-                        </div>
-                    </div>
-                    <div style="color: var(--white); font-size: 0.9rem; line-height: 1.5;">${comment.content}</div>
+            // 날짜 안전하게 처리
+            let dateStr = "작성일 정보 없음";
+            if (post.timestamp) {
+                if (typeof post.timestamp.toDate === 'function') {
+                    dateStr = post.timestamp.toDate().toLocaleString('ko-KR');
+                } else {
+                    dateStr = new Date(post.timestamp).toLocaleString('ko-KR');
+                }
+            }
+            
+            // 추천 정보 안전하게 처리
+            const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+            const isPostLiked = likedPosts.includes(docId);
+            const likesCount = post.likes || 0;
+            
+            const postButtons = `
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button onclick="likePost('${docId}')" style="background: ${isPostLiked ? 'var(--orange)' : 'rgba(255, 92, 0, 0.1)'}; border: 1px solid var(--orange); color: ${isPostLiked ? 'white' : 'var(--orange)'}; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; gap: 6px; transition: 0.3s;">
+                        👍 ${likesCount}
+                    </button>
+                    <button onclick="editPost('${docId}')" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--white); padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.8rem;">수정</button>
+                    <button onclick="deletePost('${docId}')" style="background: rgba(255,0,61,0.1); border: 1px solid rgba(255,0,61,0.2); color: var(--red); padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.8rem;">삭제</button>
                 </div>
             `;
-        }).join('');
 
-        postCard.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 25px;">
-                <div style="flex: 1;">
-                    <h4 style="font-size: 1.4rem; color: var(--white); margin-bottom: 10px; letter-spacing: -0.8px; font-weight: 800;">${post.title}</h4>
-                    <div style="display: flex; gap: 12px; align-items: center;">
-                        <span style="font-size: 0.9rem; color: var(--orange); font-weight: 700;">${post.name}</span>
-                        <div style="width: 3px; height: 3px; background: var(--glass-border); border-radius: 50%;"></div>
-                        <span style="font-size: 0.8rem; color: var(--text-dim);">${dateStr}</span>
+            // 댓글 목록 안전하게 처리
+            const postComments = Array.isArray(post.comments) ? post.comments : [];
+            const likedComments = JSON.parse(localStorage.getItem('liked_comments') || '[]');
+            
+            let commentsHtml = postComments.map((comment, idx) => {
+                const isCommentLiked = likedComments.includes(`${docId}_${idx}`);
+                return `
+                    <div style="margin-top: 15px; padding: 20px; background: rgba(255,255,255,0.02); border-radius: 18px; border: 1px solid var(--glass-border);">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                            <div>
+                                <span style="color: var(--orange); font-weight: 800; font-size: 0.85rem;">${comment.author || '익명'}</span>
+                                <span style="color: var(--text-dim); font-size: 0.75rem; margin-left: 10px;">${comment.date || ''}</span>
+                            </div>
+                            <div style="display: flex; gap: 12px; align-items: center;">
+                                 <button onclick="likeComment('${docId}', ${idx})" style="background: none; border: none; color: ${isCommentLiked ? 'var(--orange)' : 'var(--text-dim)'}; cursor: pointer; font-size: 0.8rem; font-weight: ${isCommentLiked ? '800' : '400'};">👍 ${comment.likes || 0}</button>
+                                 <button onclick="deleteComment('${docId}', ${idx})" style="background: none; border: none; color: var(--red); cursor: pointer; font-size: 0.75rem; opacity: 0.6;">삭제</button>
+                            </div>
+                        </div>
+                        <div style="color: var(--white); font-size: 0.9rem; line-height: 1.5;">${comment.content || ''}</div>
+                    </div>
+                `;
+            }).join('');
+
+            postCard.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 25px;">
+                    <div style="flex: 1;">
+                        <h4 style="font-size: 1.4rem; color: var(--white); margin-bottom: 10px; letter-spacing: -0.8px; font-weight: 800;">${post.title || '제목 없음'}</h4>
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <span style="font-size: 0.9rem; color: var(--orange); font-weight: 700;">${post.name || '익명'}</span>
+                            <div style="width: 3px; height: 3px; background: var(--glass-border); border-radius: 50%;"></div>
+                            <span style="font-size: 0.8rem; color: var(--text-dim);">${dateStr}</span>
+                        </div>
+                    </div>
+                    ${postButtons}
+                </div>
+                <p style="color: var(--text-dim); font-size: 1rem; line-height: 1.8; white-space: pre-wrap; margin-bottom: 30px; border-bottom: 1px solid var(--glass-border); padding-bottom: 30px;">${post.content || ''}</p>
+                
+                <div style="margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h5 style="color: var(--white); font-size: 1rem; display: flex; align-items: center; gap: 8px;">
+                             댓글 <span style="color: var(--orange); font-weight: 800;">${postComments.length}</span>
+                        </h5>
+                        <button onclick="toggleCommentForm('${docId}')" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--white); padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem;">댓글 쓰기</button>
+                    </div>
+                    <div id="comments-${docId}">${commentsHtml}</div>
+                </div>
+
+                <!-- 댓글 작성 폼 (기본 숨김) -->
+                <div id="comment-form-${docId}" style="display: none; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border); margin-top: 15px; animation: slideDown 0.3s ease-out;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                        <input type="text" id="comment-name-${docId}" placeholder="이름" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; color: white; font-size: 0.8rem; outline: none;">
+                        <input type="password" id="comment-pw-${docId}" placeholder="비밀번호" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; color: white; font-size: 0.8rem; outline: none;">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <textarea id="comment-content-${docId}" placeholder="댓글을 입력하세요..." style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; color: white; font-size: 0.85rem; outline: none; min-height: 44px; height: 44px; resize: none;"></textarea>
+                        <button onclick="addComment('${docId}')" style="background: var(--orange); color: white; border: none; padding: 0 15px; border-radius: 10px; font-weight: 800; cursor: pointer; height: 44px;">등록</button>
                     </div>
                 </div>
-                ${postButtons}
-            </div>
-            <p style="color: var(--text-dim); font-size: 1rem; line-height: 1.8; white-space: pre-wrap; margin-bottom: 30px; border-bottom: 1px solid var(--glass-border); padding-bottom: 30px;">${post.content}</p>
-            
-            <div style="margin-bottom: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h5 style="color: var(--white); font-size: 1rem; display: flex; align-items: center; gap: 8px;">
-                         댓글 <span style="color: var(--orange); font-weight: 800;">${(post.comments || []).length}</span>
-                    </h5>
-                    <button onclick="toggleCommentForm('${docId}')" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--white); padding: 6px 12px; border-radius: 10px; cursor: pointer; font-size: 0.75rem;">댓글 쓰기</button>
-                </div>
-                <div id="comments-${docId}">${commentsHtml}</div>
-            </div>
-
-            <!-- 댓글 작성 폼 (기본 숨김) -->
-            <div id="comment-form-${docId}" style="display: none; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 20px; border: 1px solid var(--glass-border); margin-top: 15px; animation: slideDown 0.3s ease-out;">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-                    <input type="text" id="comment-name-${docId}" placeholder="이름" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; color: white; font-size: 0.8rem; outline: none;">
-                    <input type="password" id="comment-pw-${docId}" placeholder="비밀번호" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; color: white; font-size: 0.8rem; outline: none;">
-                </div>
-                <div style="display: flex; gap: 10px;">
-                    <textarea id="comment-content-${docId}" placeholder="댓글을 입력하세요..." style="flex: 1; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-radius: 10px; color: white; font-size: 0.85rem; outline: none; min-height: 44px; height: 44px; resize: none;"></textarea>
-                    <button onclick="addComment('${docId}')" style="background: var(--orange); color: white; border: none; padding: 0 15px; border-radius: 10px; font-weight: 800; cursor: pointer; height: 44px;">등록</button>
-                </div>
-            </div>
-        `;
-        list.appendChild(postCard);
+            `;
+            list.appendChild(postCard);
+        } catch (err) {
+            console.error("게시글 렌더링 중 오류:", err, snapDoc.data());
+        }
     });
 });
 
