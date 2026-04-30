@@ -367,11 +367,11 @@ onSnapshot(boardQuery, (snapshot) => {
             
             const postButtons = `
                 <div style="display: flex; gap: 10px; align-items: center;">
-                    <button onclick="likePost('${docId}')" style="background: rgba(255,255,255,0.05); border: 1px solid ${isPostLiked ? 'var(--orange)' : 'var(--glass-border)'}; color: ${isPostLiked ? 'var(--orange)' : 'var(--white)'}; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; gap: 6px; transition: 0.3s;">
+                    <button onclick="event.stopPropagation(); likePost('${docId}')" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: ${isPostLiked ? 'var(--orange)' : 'var(--white)'}; padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.85rem; font-weight: 800; display: flex; align-items: center; gap: 6px; transition: 0.2s; outline: none;">
                         👍 ${likesCount}
                     </button>
-                    <button onclick="editPost('${docId}')" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--white); padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.8rem;">수정</button>
-                    <button onclick="deletePost('${docId}')" style="background: rgba(255,0,61,0.1); border: 1px solid rgba(255,0,61,0.2); color: var(--red); padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.8rem;">삭제</button>
+                    <button onclick="event.stopPropagation(); editPost('${docId}')" style="background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: var(--white); padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.8rem;">수정</button>
+                    <button onclick="event.stopPropagation(); deletePost('${docId}')" style="background: rgba(255,0,61,0.1); border: 1px solid rgba(255,0,61,0.2); color: var(--red); padding: 8px 15px; border-radius: 12px; cursor: pointer; font-size: 0.8rem;">삭제</button>
                 </div>
             `;
 
@@ -389,8 +389,8 @@ onSnapshot(boardQuery, (snapshot) => {
                                 <span style="color: var(--text-dim); font-size: 0.75rem; margin-left: 10px;">${comment.date || ''}</span>
                             </div>
                             <div style="display: flex; gap: 12px; align-items: center;">
-                                 <button onclick="likeComment('${docId}', ${idx})" style="background: none; border: none; color: ${isCommentLiked ? 'var(--orange)' : 'var(--text-dim)'}; cursor: pointer; font-size: 0.8rem; font-weight: ${isCommentLiked ? '800' : '400'}; transition: 0.2s;">👍 ${comment.likes || 0}</button>
-                                 <button onclick="deleteComment('${docId}', ${idx})" style="background: none; border: none; color: var(--red); cursor: pointer; font-size: 0.75rem; opacity: 0.6;">삭제</button>
+                                 <button onclick="event.stopPropagation(); likeComment('${docId}', ${idx})" style="background: none; border: none; color: ${isCommentLiked ? 'var(--orange)' : 'var(--text-dim)'}; cursor: pointer; font-size: 0.8rem; font-weight: ${isCommentLiked ? '800' : '400'}; transition: 0.2s; outline: none;">👍 ${comment.likes || 0}</button>
+                                 <button onclick="event.stopPropagation(); deleteComment('${docId}', ${idx})" style="background: none; border: none; color: var(--red); cursor: pointer; font-size: 0.75rem; opacity: 0.6;">삭제</button>
                             </div>
                         </div>
                         <div style="color: var(--white); font-size: 0.9rem; line-height: 1.5;">${comment.content || ''}</div>
